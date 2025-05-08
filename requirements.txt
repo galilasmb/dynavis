@@ -1,7 +1,6 @@
-streamlit
+streamlit>=1.30.0
 pandas
-matplotlib
 numpy
+matplotlib
 seaborn
-plotly
-plotly.express
+plotly>=5.18.0
