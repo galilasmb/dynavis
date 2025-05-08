@@ -1,7 +1,5 @@
 # Dynavis - Painel Interativo de Indicadores SAPS
 
-![Logo Gov](imgs/logo_gov.png) ![Logo MS](imgs/logo_ms_brasil.png)
-
 **Dynavis** é um painel interativo desenvolvido com [Streamlit](https://streamlit.io/) para a visualização dinâmica de indicadores de cadastros da Atenção Primária à Saúde (APS). Ele permite carregar dados CSV, selecionar até 3 colunas de interesse e gerar automaticamente visualizações e tabelas personalizadas.
 
 ## Funcionalidades
@@ -15,12 +13,6 @@
   - Séries temporais, boxplot, violin plot e heatmap
 - Interface visual elegante com personalização via CSS
 - Exportação dos dados agregados para CSV
-
-## Captura de tela
-
-<p align="center">
-  <img src="imgs/screenshot.png" alt="Exemplo da interface" width="600"/>
-</p>
 
 ## Requisitos
 
@@ -58,7 +50,7 @@ cd dynavis
 2. Execute o painel:
 
 ```bash
-streamlit run app.py
+streamlit run main.py
 ```
 
 3. Acesse no navegador: `http://localhost:8501`
