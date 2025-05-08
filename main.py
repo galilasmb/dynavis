@@ -141,10 +141,18 @@ if uploaded_file is not None:
         max_selections=3,
         placeholder="Escolha as colunas desejadas..."
     )
-
+            
     if not selected_cols:
         st.warning("Por favor, selecione ao menos uma coluna.")
     else:
+
+        for col in selected_cols:
+            if df[col].dtype == 'object':
+                try:
+                    df[col] = pd.to_datetime(df[col])
+                except:
+                    pass
+
         # substituir valores nulos por uma string para evitar problemas em value_counts
         safe_df = df[selected_cols].fillna('SEM INFORMAÇÃO')
 
@@ -191,6 +199,35 @@ if uploaded_file is not None:
 
             elif len(selected_cols) == 2:
                 col1, col2 = selected_cols
+
+                numeric_col = next((col for col in selected_cols if pd.api.types.is_numeric_dtype(df[col])), None)
+                categorical_col = next((col for col in selected_cols if not pd.api.types.is_numeric_dtype(df[col])), None)
+
+                date_cols = [col for col in selected_cols if pd.api.types.is_datetime64_any_dtype(df[col])]
+    
+                if date_cols:
+                    time_col = date_cols[0]
+                    value_col = [col for col in selected_cols if col != time_col][0]
+
+                    st.markdown("**Série Temporal**")
+                    time_data = df[[time_col, value_col]].copy()
+                    time_data['Contagem'] = 1
+                    time_grouped = time_data.groupby([time_col, value_col]).count().reset_index()
+
+                    fig = px.line(time_grouped, x=time_col, y="Contagem", color=value_col)
+                    st.plotly_chart(fig, use_container_width=True)
+    
+                if all(pd.api.types.is_numeric_dtype(df[col]) for col in selected_cols):
+                    st.markdown("**Dispersão (Scatter)**")
+                    st.plotly_chart(px.scatter(df, x=selected_cols[0], y=selected_cols[1]), use_container_width=True)
+
+                if numeric_col and categorical_col:
+                    st.markdown("**Boxplot**")
+                    st.plotly_chart(px.box(df, x=categorical_col, y=numeric_col), use_container_width=True)
+
+                    st.markdown("**Violin Plot**")
+                    st.plotly_chart(px.violin(df, x=categorical_col, y=numeric_col, box=True, points="all"), use_container_width=True)
+
 
                 st.markdown("**Barras Agrupadas**")
                 st.plotly_chart(px.bar(group, x=col1, y='total', color=col2, barmode='group', text='total'), use_container_width=True)
