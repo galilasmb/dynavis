@@ -68,7 +68,3 @@ dynavis/
 ├── requirements.txt     # Dependências Python
 └── README.md            # Este arquivo
 ```
-
-## Licença
-
-Este projeto é distribuído sob a licença MIT. Consulte o arquivo [LICENSE](LICENSE) para mais detalhes.
