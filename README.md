@@ -60,7 +60,7 @@ streamlit run main.py
 ```
 dynavis/
 │
-├── app.py               # Código principal do painel
+├── main.py               # Código principal do painel
 ├── imgs/                # Logos e imagens
 │   ├── logo_gov.png
 │   ├── logo_ms_brasil.png
