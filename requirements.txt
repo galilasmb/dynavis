@@ -4,3 +4,5 @@ numpy
 matplotlib
 seaborn
 plotly>=5.18.0
+pyarrow
+fastparquet

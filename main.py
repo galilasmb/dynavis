@@ -127,26 +127,50 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+columns = []
 uploaded_file = None
-
-# default_path = '../../data/cadastros_SE.csv'
-default_path = ''
 no_file = False
 
-if uploaded_file is not None:
-    df = pd.read_csv(uploaded_file)
-elif os.path.exists(default_path):
-    df = pd.read_csv(default_path, sep=',')
-else:
-    df = pd.DataFrame()
-    no_file = True
-    print(f"Arquivo não encontrado: {default_path}")
+default_path = ''
+df = pd.DataFrame()
 
-columns = df.columns.tolist()
-
+def load_file(file):
+    ext = os.path.splitext(file.name if hasattr(file, 'name') else file)[1].lower()
+    if ext == '.csv':
+        return pd.read_csv(file)
+    elif ext in ['.xls', '.xlsx']:
+        return pd.read_excel(file)
+    elif ext == '.json':
+        return pd.read_json(file)
+    elif ext == '.parquet':
+        try:
+            return pd.read_parquet(file)
+        except ImportError:
+            st.warning("Para ler arquivos .parquet, instale pyarrow ou fastparquet.")
+            return pd.DataFrame()
+    else:
+        st.warning(f"Formato de arquivo não suportado: {ext}")
+        return pd.DataFrame()
 
 with st.sidebar:
     st.header("Configuração")
+
+    # upload do arquivo dentro da sidebar
+    uploaded_file = st.file_uploader(
+        "Carregue o arquivo de dados (CSV, Excel, JSON, Parquet)", 
+        type=["csv", "xls", "xlsx", "json", "parquet"]
+    )
+
+    # carregamento do DataFrame
+    if uploaded_file is not None:
+        df = load_file(uploaded_file)
+    elif os.path.exists(default_path):
+        df = load_file(default_path)
+    else:
+        st.warning(f"Selecione um arquivo!")
+        df = pd.DataFrame()
+
+    columns = df.columns.tolist()
 
     st.markdown("### Filtros (até 3 - opcional)")
 
@@ -162,17 +186,8 @@ with st.sidebar:
             )
             filters.append((col_filter, val_filter))
 
-    # # Novo filtro: seleção da coluna e valor
-    # st.markdown("### Filtro")
-    # filter_col = st.selectbox("Coluna para filtrar (opcional):", options=[""] + columns)
-    # filter_val = None
-    # if filter_col:
-    #     unique_vals = df[filter_col].dropna().unique().tolist()
-    #     filter_val = st.selectbox(f"Valor para {filter_col}:", options=sorted(unique_vals))
-
-    # Seleção das colunas principais para agregação
     st.markdown("### Colunas para Análise")
-    
+
     selected_cols = st.multiselect(
         "Selecione 1 a 3 colunas para análise:",
         columns,
@@ -180,13 +195,16 @@ with st.sidebar:
         placeholder="Escolha as colunas desejadas..."
     )
 
-    uploaded_file = st.file_uploader("Carregue o arquivo CSV", type=["csv"])
+# st.write("Colunas carregadas:", df.columns.tolist())
+
+columns = df.columns.tolist()
+
+print(columns)
 
 # Aplica o filtro, se selecionado
 filtered_df = df.copy()
 for col, val in filters:
     filtered_df = filtered_df[filtered_df[col] == val]
-
 
 if no_file:
     st.warning("Por favor, selecione um arquivo de entrada.")
